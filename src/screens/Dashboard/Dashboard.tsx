@@ -31,16 +31,36 @@ const Dashboard = () => {
   const theme = useTheme();
   const [isLoading, setIsloading] = React.useState(true);
   const [task, setTask] = React.useState<DatalistProps[]>([]);
+
+  const dateFormatter = (date: Date) => {
+    const dateFormatted = Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+    }).format(new Date(date));
+
+    return dateFormatted;
+  };
+
   const handleRemoveTask = async (id: string) => {
     try {
-      const removeFromList = task.filter(
+      const response = await AsyncStorage.getItem(dataKeyDescriptions);
+      const descriptions = response ? JSON.parse(response) : [];
+
+      const removeFromList = descriptions.filter(
         (item: DatalistProps) => item.id !== id
       );
+
+      const removeFromState = task.filter(
+        (item: DatalistProps) => item.id !== id
+      );
+
       await AsyncStorage.setItem(
         dataKeyDescriptions,
         JSON.stringify(removeFromList)
       );
-      setTask(removeFromList);
+
+      setTask(removeFromState);
     } catch (error) {
       console.log(error);
     }
@@ -54,14 +74,10 @@ const Dashboard = () => {
 
       const taskFormatted: DatalistProps[] = descriptions.map(
         (item: DatalistProps, idx: number) => {
-          const dateFormatted = Intl.DateTimeFormat("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "2-digit",
-          }).format(new Date(item.date));
+          const dateFormatted = dateFormatter(item.date);
 
           return {
-            id: `${item.id}-${idx}`,
+            id: item.id,
             title: item.title,
             description: item.description,
             category: item.category,
@@ -87,6 +103,17 @@ const Dashboard = () => {
     }, [])
   );
 
+  const handleFilterTaskOfTheDay = () => {
+    const today = new Date();
+    const todayFormatted = dateFormatter(today);
+
+    const filterTask = task.filter(
+      (item: DatalistProps) => item.date === todayFormatted
+    );
+
+    return filterTask;
+  };
+
   return (
     <Container>
       {isLoading ? (
@@ -111,7 +138,10 @@ const Dashboard = () => {
             </UserWrapper>
           </Header>
           <HighlightCards>
-            <HighlightCard title="Expiradas" task={task} />
+            <HighlightCard
+              title="Tarefas do dia"
+              task={handleFilterTaskOfTheDay()}
+            />
           </HighlightCards>
           <Descriptions>
             <Title>Listagem</Title>
