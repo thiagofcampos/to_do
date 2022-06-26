@@ -5,17 +5,7 @@ import {
 } from "@react-native-community/datetimepicker";
 import Select from "../Forms/Select";
 
-interface Props extends AndroidNativeProps {
-  text: string;
-}
-
-const DatePicker = ({
-  onChange,
-  display,
-  value,
-  mode = "date",
-  text,
-}: Props) => {
+const DatePicker = ({ onChange, value }: AndroidNativeProps) => {
   const showMode = () => {
     DateTimePickerAndroid.open({
       value: value,

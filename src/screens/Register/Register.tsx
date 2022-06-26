@@ -30,14 +30,14 @@ type NavigationProps = {
 };
 
 const Register = ({ selectedItem, data, closeEditModal }: Props) => {
+  const dataKeyDescriptions = "@todocontroll:description";
+  const pageTile = selectedItem ? "Editar" : "Cadastrar";
   const [category, setCategory] = React.useState({
     key: "category",
     name: "Categoria",
   });
-  const dataKeyDescriptions = "@todocontroll:description";
   const [modalOpen, setModalOpen] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
-  const pageTile = selectedItem ? "Editar" : "Cadastrar";
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -90,7 +90,6 @@ const Register = ({ selectedItem, data, closeEditModal }: Props) => {
   const returnToDashboard = () => {
     if (closeEditModal) {
       closeEditModal();
-      navigation.navigate("Listagem");
     } else {
       navigation.navigate("Listagem");
     }
@@ -101,7 +100,7 @@ const Register = ({ selectedItem, data, closeEditModal }: Props) => {
       return Alert.alert("Selecione uma categoria");
 
     const dataFormRegister = {
-      id: selectedItem?.id || String(uuid.v4()),
+      id: String(uuid.v4()),
       description: form.description,
       category: category.key,
       date: date,
@@ -110,7 +109,6 @@ const Register = ({ selectedItem, data, closeEditModal }: Props) => {
     try {
       const data = await AsyncStorage.getItem(dataKeyDescriptions);
       const currentData = data ? JSON.parse(data) : [];
-      const teste = prepareValues(currentData, form);
       const dataFormatted = selectedItem?.id
         ? prepareValues(currentData, form)
         : [...currentData, dataFormRegister];
@@ -174,12 +172,11 @@ const Register = ({ selectedItem, data, closeEditModal }: Props) => {
             />
             <Select text={category.name} onPress={handleOpenModal} />
             <DatePicker
-              text="Data"
               value={date}
               onChange={(e) => handleChangeDate(e.nativeEvent.timestamp)}
             />
           </Fields>
-          <Buttom onPress={handleSubmit(handleRegister)} text={"Submit"} />
+          <Buttom onPress={handleSubmit(handleRegister)} text={"Registrar"} />
         </Form>
         <Modal visible={modalOpen}>
           <CategorySelect

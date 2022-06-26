@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Header, Title, Content, Description } from "./styles";
+import { formatDate } from "../../utils/formatDate";
 
 interface item {
   description: string;
@@ -21,7 +22,7 @@ const HighlightCard = ({ task, title }: Props) => {
         {task.map((item: item, index) => {
           return (
             <Description key={`description-${index}`}>
-              {item.description} - {item.date}
+              {item.description} - {formatDate(item.date)}
             </Description>
           );
         })}

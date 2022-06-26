@@ -1,6 +1,6 @@
 import React from "react";
 import { categories } from "../../utils/categories";
-
+import { formatDate } from "../../utils/formatDate";
 import {
   Description,
   Category,
@@ -42,7 +42,7 @@ const DescriptionCard = ({ data, closeCallback, onPress }: Props) => {
           <Category>
             <CategoryName>{category.name}</CategoryName>
           </Category>
-          <Date>{date}</Date>
+          <Date>{formatDate(date)}</Date>
         </Footer>
       </TouchableOpacity>
     </Container>

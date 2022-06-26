@@ -5,6 +5,7 @@ import { ActivityIndicator, Modal } from "react-native";
 import DescriptionCard, {
   DescriptionCardProps,
 } from "../../components/DescriptionCard";
+import { formatDate } from "../../utils/formatDate";
 import { useTheme } from "styled-components";
 import { useFocusEffect } from "@react-navigation/native";
 import {
@@ -40,38 +41,13 @@ const Dashboard = () => {
   };
 
   const handleOpenModal = async (props: DatalistProps) => {
-    const response = await AsyncStorage.getItem(dataKeyDescriptions);
-    const descriptions = response ? JSON.parse(response) : [];
-    const selectDataObject = descriptions.find(
-      (item: DatalistProps) => item.id === props.id
-    );
-    setSelectedItem({
-      ...props,
-      date: selectDataObject.date,
-    });
+    setSelectedItem({ ...props });
     setModalOpen(true);
-  };
-
-  const dateFormatter = (date: Date) => {
-    const dateFormatted = Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
-    }).format(new Date(date));
-
-    return dateFormatted;
   };
 
   const handleRemoveTask = async (id: string) => {
     try {
-      const response = await AsyncStorage.getItem(dataKeyDescriptions);
-      const descriptions = response ? JSON.parse(response) : [];
-
-      const removeFromList = descriptions.filter(
-        (item: DatalistProps) => item.id !== id
-      );
-
-      const removeFromState = task.filter(
+      const removeFromList = task.filter(
         (item: DatalistProps) => item.id !== id
       );
 
@@ -80,7 +56,7 @@ const Dashboard = () => {
         JSON.stringify(removeFromList)
       );
 
-      setTask(removeFromState);
+      setTask(removeFromList);
     } catch (error) {
       console.log(error);
     }
@@ -88,37 +64,16 @@ const Dashboard = () => {
 
   async function loadDescriptions() {
     try {
-      //AsyncStorage.clear();
       const response = await AsyncStorage.getItem(dataKeyDescriptions);
 
       const descriptions = response ? JSON.parse(response) : [];
-      const taskFormatted: DatalistProps[] = descriptions.map(
-        (item: DatalistProps) => {
-          const dateFormatted = Intl.DateTimeFormat("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "2-digit",
-          }).format(new Date(item.date));
 
-          return {
-            id: item.id,
-            description: item.description,
-            category: item.category,
-            date: dateFormatted,
-          };
-        }
-      );
-
-      setTask(taskFormatted);
+      setTask(descriptions);
       setIsloading(false);
     } catch (error) {
       console.log(error);
     }
   }
-
-  React.useEffect(() => {
-    loadDescriptions();
-  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -129,13 +84,11 @@ const Dashboard = () => {
   );
 
   const handleFilterTaskOfTheDay = () => {
-    const today = new Date();
-    const todayFormatted = dateFormatter(today);
-
-    const filterTask = task.filter(
-      (item: DatalistProps) => item.date === todayFormatted
-    );
-
+    const today = new Date().getDate();
+    const filterTask = task.filter((item: DatalistProps) => {
+      const getDate = new Date(item.date).getDate();
+      return getDate === today;
+    });
     return filterTask;
   };
 
