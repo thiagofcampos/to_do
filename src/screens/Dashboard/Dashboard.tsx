@@ -1,7 +1,7 @@
 import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HighlightCard from "../../components/HighlightCard";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Modal } from "react-native";
 import DescriptionCard, {
   DescriptionCardProps,
 } from "../../components/DescriptionCard";
@@ -22,6 +22,7 @@ import {
   DescriptionsList,
   LoaderContainer,
 } from "./styles";
+import Register from "../Register/Register";
 
 export interface DatalistProps extends DescriptionCardProps {
   id: string;
@@ -30,7 +31,27 @@ const Dashboard = () => {
   const dataKeyDescriptions = "@todocontroll:description";
   const theme = useTheme();
   const [isLoading, setIsloading] = React.useState(true);
+  const [modalOpen, setModalOpen] = React.useState(false);
   const [task, setTask] = React.useState<DatalistProps[]>([]);
+  const [selectedItem, setSelectedItem] = React.useState<DatalistProps>();
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleOpenModal = async (props: DatalistProps) => {
+    const response = await AsyncStorage.getItem(dataKeyDescriptions);
+    const descriptions = response ? JSON.parse(response) : [];
+
+    const selectDataObject = descriptions.find(
+      (item: DatalistProps) => item.id === props.id
+    );
+    setSelectedItem({
+      ...props,
+      date: selectDataObject.date,
+    });
+    setModalOpen(true);
+  };
 
   const dateFormatter = (date: Date) => {
     const dateFormatted = Intl.DateTimeFormat("pt-BR", {
@@ -73,12 +94,15 @@ const Dashboard = () => {
       const descriptions = response ? JSON.parse(response) : [];
 
       const taskFormatted: DatalistProps[] = descriptions.map(
-        (item: DatalistProps, idx: number) => {
-          const dateFormatted = dateFormatter(item.date);
+        (item: DatalistProps) => {
+          const dateFormatted = Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+          }).format(new Date(item.date));
 
           return {
             id: item.id,
-            title: item.title,
             description: item.description,
             category: item.category,
             date: dateFormatted,
@@ -99,8 +123,10 @@ const Dashboard = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      loadDescriptions();
-    }, [])
+      if (!modalOpen) {
+        loadDescriptions();
+      }
+    }, [modalOpen])
   );
 
   const handleFilterTaskOfTheDay = () => {
@@ -151,11 +177,19 @@ const Dashboard = () => {
               renderItem={({ item }) => (
                 <DescriptionCard
                   data={item}
+                  onPress={() => handleOpenModal(item)}
                   closeCallback={() => handleRemoveTask(item.id)}
                 />
               )}
             />
           </Descriptions>
+          <Modal visible={modalOpen}>
+            <Register
+              data={task}
+              selectedItem={selectedItem}
+              closeEditModal={handleCloseModal}
+            />
+          </Modal>
         </>
       )}
     </Container>

@@ -14,14 +14,8 @@ export const Container = styled.View`
 export const HeaderContainer = styled.View`
     display: flex;
     flex-direction: row;
-    justify-content: space-between
+    justify-content: flex-end
     align-items: center;
-    `;
-
-export const Title = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.regular};
-  color: ${({ theme }) => theme.colors.text_dark}
-  font-size:${RFValue(14)}px;
     `;
 
 export const Description = styled.Text`

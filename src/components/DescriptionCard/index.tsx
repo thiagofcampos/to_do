@@ -8,13 +8,11 @@ import {
   Container,
   FeatherStyled,
   Footer,
-  Title,
   Date,
   HeaderContainer,
 } from "./styles";
 import { TouchableOpacity, View } from "react-native";
 export interface DescriptionCardProps {
-  title: string;
   description: string;
   category: string;
   date: string;
@@ -23,28 +21,30 @@ export interface DescriptionCardProps {
 interface Props {
   data: DescriptionCardProps;
   closeCallback?: () => void;
+  onPress?: () => void;
 }
 
-const DescriptionCard = ({ data, closeCallback }: Props) => {
+const DescriptionCard = ({ data, closeCallback, onPress }: Props) => {
   const category = categories.filter((item) => item.key === data.category)[0];
-  const { description, date, title } = data;
+  const { description, date } = data;
   return (
     <Container>
-      <HeaderContainer>
-        <Title>{title}</Title>
-        {closeCallback && (
-          <TouchableOpacity onPress={closeCallback}>
-            <FeatherStyled name={"x-circle"} />
-          </TouchableOpacity>
-        )}
-      </HeaderContainer>
-      <Description>{description}</Description>
-      <Footer>
-        <Category>
-          <CategoryName>{category.name}</CategoryName>
-        </Category>
-        <Date>{date}</Date>
-      </Footer>
+      <TouchableOpacity onPress={onPress}>
+        <HeaderContainer>
+          {closeCallback && (
+            <TouchableOpacity onPress={closeCallback}>
+              <FeatherStyled name={"x-circle"} />
+            </TouchableOpacity>
+          )}
+        </HeaderContainer>
+        <Description>{description}</Description>
+        <Footer>
+          <Category>
+            <CategoryName>{category.name}</CategoryName>
+          </Category>
+          <Date>{date}</Date>
+        </Footer>
+      </TouchableOpacity>
     </Container>
   );
 };
