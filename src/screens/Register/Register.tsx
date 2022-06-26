@@ -69,13 +69,17 @@ const Register = ({ selectedItem, data, closeEditModal }: Props) => {
   };
 
   const prepareValues = (currentData: DatalistProps[], form: FormType) => {
-    return data?.map((item) => {
+    return currentData?.map((item) => {
       if (item.id === selectedItem?.id) {
         return {
           id: selectedItem?.id,
           description: form.description,
           category: category.key,
           date: date,
+        };
+      } else {
+        return {
+          ...item,
         };
       }
     });
@@ -106,7 +110,7 @@ const Register = ({ selectedItem, data, closeEditModal }: Props) => {
     try {
       const data = await AsyncStorage.getItem(dataKeyDescriptions);
       const currentData = data ? JSON.parse(data) : [];
-
+      const teste = prepareValues(currentData, form);
       const dataFormatted = selectedItem?.id
         ? prepareValues(currentData, form)
         : [...currentData, dataFormRegister];

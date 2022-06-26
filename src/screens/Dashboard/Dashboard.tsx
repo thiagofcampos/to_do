@@ -42,7 +42,6 @@ const Dashboard = () => {
   const handleOpenModal = async (props: DatalistProps) => {
     const response = await AsyncStorage.getItem(dataKeyDescriptions);
     const descriptions = response ? JSON.parse(response) : [];
-
     const selectDataObject = descriptions.find(
       (item: DatalistProps) => item.id === props.id
     );
@@ -89,10 +88,10 @@ const Dashboard = () => {
 
   async function loadDescriptions() {
     try {
+      //AsyncStorage.clear();
       const response = await AsyncStorage.getItem(dataKeyDescriptions);
 
       const descriptions = response ? JSON.parse(response) : [];
-
       const taskFormatted: DatalistProps[] = descriptions.map(
         (item: DatalistProps) => {
           const dateFormatted = Intl.DateTimeFormat("pt-BR", {
